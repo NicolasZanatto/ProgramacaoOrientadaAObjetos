@@ -3,9 +3,6 @@ package trabalhoOrientadaAObjetos;
 import java.io.Serializable;
 import java.util.*;
 
-import persistence.exceptions.FalhaAcessoAosDadosException;
-import persistence.exceptions.FalhaAcessoDadosAvisosException;
-import persistence.file.FileAvisosDao;
 
 public class Patrocinador extends Participante implements Serializable
 {
@@ -23,34 +20,23 @@ public class Patrocinador extends Participante implements Serializable
 		avisos= new ArrayList<Aviso>();
 	}
 	
-	public Aviso cadastrarAvisosGerais(String aviso)
+	public Aviso cadastrarAvisosGerais(Aviso aviso)
 	{
-		Aviso novoAviso = new Aviso();
-		novoAviso.setMsg(aviso);
-		avisos.add(novoAviso);
+
+		avisos.add(aviso);
 	
-		return novoAviso;
+		return aviso;
 	}
 
-	public final void showAvisosGerais()
-	{
-		atualizaAvisosGerais();
-	//	System.out.println("-----Avisos Gerais-----");
-		for (Aviso mens : avisos)
-		{
-			System.out.println(mens.getMsg());
-		}
-	}
+
 	
-	public void atualizaAvisosGerais()
-	{
-		FileAvisosDao avisoDao = new FileAvisosDao();
-		
-			try {
-				avisos = (ArrayList<Aviso>) avisoDao.buscaTodos();
-			} catch (FalhaAcessoDadosAvisosException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+	public ArrayList<Aviso> getAvisos() {
+		return avisos;
 	}
+
+	public void setAvisos(ArrayList<Aviso> avisos) {
+		this.avisos = avisos;
+	}
+
+
 }

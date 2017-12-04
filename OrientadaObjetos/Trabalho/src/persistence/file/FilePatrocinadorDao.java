@@ -60,7 +60,7 @@ public class FilePatrocinadorDao implements PatrocinadorDAO{
 		return participantes;
 	}
 	
-	protected void gravaArquivo(List<Patrocinador> patrocinador)					//OUTPUT - Escreve
+	public void gravaArquivo(List<Patrocinador> patrocinador)					//OUTPUT - Escreve
 			throws FalhaAcessoDadosPatrocinadorException {
 		FileOutputStream fout;
 		try {

@@ -14,25 +14,16 @@ public class Participante implements Serializable
 	private String Codinome;
 	private Participante AmigoSecreto;
 	private ArrayList<SugestaoPresente> SugestoesPresentes;
-//	private ArrayList<Mensagem> recebidas;
-//	private ArrayList<Mensagem> enviadas;
-		
-	private int qntdRecebidas;
-	private int qntdEnviadas;
-	
+	private ArrayList<Mensagem> recebidas;
+	private ArrayList<Mensagem> enviadas;
 	
 	public int getQntdRecebidas() {
-		return qntdRecebidas;
-	}
-	public void setQntdRecebidas() {
-		this.qntdRecebidas++;
+		return recebidas.size();
 	}
 	public int getQntdEnviadas() {
-		return qntdEnviadas;
+		return enviadas.size();
 	}
-	public void setQntdEnviadas() {
-		this.qntdEnviadas++;
-	}
+
 	public final String getNome()
 	{
 		return Nome;
@@ -79,6 +70,7 @@ public class Participante implements Serializable
 	public Participante()
 	{ 
 		inicializa();
+		
 	}
 	public final ArrayList<SugestaoPresente> getretornaListaPresentes()
 	{
@@ -115,11 +107,30 @@ public class Participante implements Serializable
 		SugestoesPresentes = new ArrayList<SugestaoPresente>();
 		Nome=null;
 		Ramal=0;
-		qntdEnviadas=0;
-		qntdRecebidas=0;
-	//	enviadas =  new ArrayList<Mensagem>();
-	//	recebidas = new ArrayList<Mensagem>();
-
+		enviadas =  new ArrayList<Mensagem>();
+		recebidas = new ArrayList<Mensagem>();
+	}
+	
+	public ArrayList<Mensagem> getRecebidas() {
+		return recebidas;
+	}
+	public void setRecebidas(ArrayList<Mensagem> recebidas) {
+		this.recebidas = recebidas;
+	}
+	
+	public ArrayList<Mensagem> getEnviadas() {
+		return enviadas;
+	}
+	public void setEnviadas(ArrayList<Mensagem> enviadas) {
+		this.enviadas = enviadas;
+	}
+	
+	public void addMensagensEnviadas(Mensagem mensagem) {
+		enviadas.add(mensagem);
+	}
+	
+	public void addMensagensRecebidas(Mensagem mensagem) {
+		recebidas.add(mensagem);
 	}
 	
 	public String toString() {

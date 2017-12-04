@@ -2,18 +2,16 @@ package trabalhoOrientadaAObjetos;
 
 import java.util.*;
 
-import persistence.exceptions.FalhaAcessoAosDadosException;
+
 import persistence.exceptions.FalhaAcessoDadosMensagemException;
 import persistence.exceptions.FalhaAcessoDadosParticipanteException;
 import persistence.exceptions.FalhaAcessoDadosPatrocinadorException;
 import persistence.exceptions.FalhaAcessoDadosSugestaoGeralException;
 import persistence.exceptions.FalhaAcessoDadosSugestaoPresenteException;
-import persistence.file.FileMensagemDao;
 import persistence.file.FileParticipanteDao;
 import persistence.file.FilePatrocinadorDao;
 import persistence.file.FileSugestaoGeralDao;
-import persistence.file.FileSugestaoPresente;
-import persistence.intf.ParticipanteDAO;
+
 
 
 public class Gerenciador
@@ -29,6 +27,7 @@ public class Gerenciador
 	private ArrayList<Patrocinador> listaPatrocinadores;
 	
 	private ArrayList<SugestaoPresente> listaSugestoesPresentes;
+	
 	
 	
 	
@@ -56,13 +55,7 @@ public class Gerenciador
 		listaParticipantes = (ArrayList<Participante>) participanteDao.buscaTodos();
 
 	}
-	
-	public void atualizaListaSugestaoPresente() throws FalhaAcessoDadosSugestaoPresenteException
-	{
-		FileSugestaoPresente sugestaoPresenteDao = new FileSugestaoPresente();
-		listaSugestoesPresentes = (ArrayList<SugestaoPresente>) sugestaoPresenteDao.buscaTodos();
 
-	}
 	
 	public void atualizaListaPatrocinadores() throws FalhaAcessoDadosPatrocinadorException
 	{
@@ -70,11 +63,7 @@ public class Gerenciador
 		listaPatrocinadores = (ArrayList<Patrocinador>) patrocinadorDao.buscaTodos();
 	}
 	
-	public void atualizaListaMensagens() throws FalhaAcessoDadosMensagemException
-	{
-		FileMensagemDao mensagemDao = new FileMensagemDao();
-		ListaDeMensagens = (ArrayList<Mensagem>) mensagemDao.buscaTodos();
-	}
+
 	
 	public void atualizaListaSugestoesGerais() throws FalhaAcessoDadosSugestaoGeralException
 	{
@@ -92,11 +81,18 @@ public class Gerenciador
 			participanteDao.gravaArquivo(listaParticipantes);
 	}
 	
+	public void gravaListaPatrocinador() throws FalhaAcessoDadosPatrocinadorException
+	{
+			FilePatrocinadorDao patrocinadorDao = new FilePatrocinadorDao();
+			patrocinadorDao.gravaArquivo(listaPatrocinadores);
+	}
+	
 	
 	//Métodos Participante
 	
 	public final Participante cadastroInfo()
 	{
+		try {
 		Scanner sc = new Scanner(System.in);
 		Participante participante = new Participante();
 
@@ -108,9 +104,15 @@ public class Gerenciador
 
 		System.out.println("Digite o codinome: ");
 		participante.setCodinome(new Scanner(System.in).nextLine());
-
 		listaParticipantes.add(participante);
 		return participante;
+
+		}catch(Exception e)
+		{
+			System.out.println("Formato Incorreto");
+		}
+		return null;
+		
 	}
 	
 	public Participante procuraParticipante(String nome) throws FalhaAcessoDadosParticipanteException
@@ -144,8 +146,9 @@ public class Gerenciador
 		return null;
 	}
 	
-	public final void mostraAmigosSecretos()
+	public final void mostraAmigosSecretos() throws FalhaAcessoDadosParticipanteException 
 	{
+		this.atualizaListaParticipantes();
 		for (Participante participante : listaParticipantes)
 		{
 			if(participante.getAmigoSecreto()==null){
@@ -154,7 +157,7 @@ public class Gerenciador
 			}
 			System.out.println(participante.getNome() + " tirou " + participante.getAmigoSecreto().getNome());
 		}
-		if(listaParticipantes.isEmpty()==true) System.out.println("A lista de participantes está vazia.");
+		if(listaParticipantes.isEmpty()==true) System.out.println("Sorteio não foi realizado.");
 	}
 	
 	
@@ -162,8 +165,6 @@ public class Gerenciador
 	{
 		atualizaListaParticipantes();
 		ArrayList<Integer> numerosSorteados = new ArrayList<Integer>();
-		for(Participante p: listaParticipantes)
-			System.out.println(p.getNome());
 		Random rdn = new Random();
 
 		while (numerosSorteados.size() < listaParticipantes.size())
@@ -187,7 +188,7 @@ public class Gerenciador
 		return numerosSorteados;
 	}
 
-	public final void matchSorteio(ArrayList<Integer> listaSorteada, ArrayList<Participante> listaParticipantes)
+	public final void matchSorteio(ArrayList<Integer> listaSorteada, ArrayList<Participante> listaParticipantes) throws FalhaAcessoDadosParticipanteException
 	{
 		int i = 0;
 		while (i < listaSorteada.size())
@@ -214,13 +215,7 @@ public class Gerenciador
 			}
 
 		}
-		
-		for(Participante participante: listaParticipantes)
-		{
-			System.out.println(participante.getNome() + " tirou " + participante.getAmigoSecreto().getNome());
-
-		}
-
+		this.gravaListaParticipantes();
 	}
 	
 	public void mostraCodinomes() throws FalhaAcessoDadosParticipanteException
@@ -278,11 +273,6 @@ public class Gerenciador
 		}
 		
 			remetente = verificaContemNaLista(listaParticipantes,codinome1);
-			remetente.setQntdEnviadas();
-		//	alteraParticipante(remetente);
-			
-		//	System.out.println("Remetente =" + remetente.getNome());
-		
 		
 		System.out.println("Digite o codinome do destinatário: ");
 		String codinome2 = new Scanner(System.in).nextLine();
@@ -297,9 +287,7 @@ public class Gerenciador
 		}
 		
 		destinatario = verificaContemNaLista(listaParticipantes,codinome2);
-		destinatario.setQntdRecebidas();
-	//	alteraParticipante(destinatario);
-		
+
 		gravaListaParticipantes();
 		
 		System.out.println("Digite a sua mensagem: ");
@@ -310,16 +298,22 @@ public class Gerenciador
 		mensagem.setDestinatario(destinatario);
 		mensagem.setMensagem(mens);
 		
-		adicionaListaMensagens(getListaDeMensagens(),mensagem);
+		remetente.addMensagensEnviadas(mensagem);
+		destinatario.addMensagensRecebidas(mensagem);
 		
-//		this.setMensagens(remetente.getMensagensEnviadas(),mensagem);
-	//	this.setMensagens(destinatario.getMensagensEnviadas(),mensagem);
+		this.gravaListaParticipantes();
 		
-		FileMensagemDao mensagemDao = new FileMensagemDao();
-		
-			mensagemDao.insereMensagem(mensagem);	
 	}
 	
+	public int getListaDeMensagens() throws FalhaAcessoDadosParticipanteException
+	{
+		this.atualizaListaParticipantes();
+		int count=0;
+		for(Participante participante : listaParticipantes)
+			count+=participante.getQntdEnviadas();
+		
+		return count;
+	}
 	
 	public void setMensagens(ArrayList<Mensagem> mensagem, Mensagem mens)
 	{
@@ -335,19 +329,19 @@ public class Gerenciador
 		return listaMensagens;
 	}
 	
-	public ArrayList<Mensagem> getListaDeMensagens() throws FalhaAcessoDadosMensagemException {
-		this.atualizaListaMensagens();
-		return ListaDeMensagens;
-	}
+
 	
-	public void  mostraMensagensEnviadas() throws FalhaAcessoDadosMensagemException
+	public void  mostraMensagensEnviadas() throws FalhaAcessoDadosParticipanteException
 	{
 		
-		atualizaListaMensagens();	
+		ArrayList<Mensagem> mensagens = new ArrayList<Mensagem>();	
+		this.atualizaListaParticipantes();
 		System.out.println("Mensagens Enviadas!");
-		for(Mensagem mensagem : getListaDeMensagens())
+		for(Participante participante: listaParticipantes)
 		{
-			System.out.println("De: " + mensagem.getRemetente().getCodinome() + "\nPara: " + mensagem.getDestinatario().getCodinome() + "\n" + mensagem.getMensagem() );
+			mensagens = participante.getEnviadas();
+			for(Mensagem mensagem : mensagens)
+				System.out.println("De: " + mensagem.getRemetente().getCodinome() + "\nPara: " + mensagem.getDestinatario().getCodinome() + "\n" + mensagem.getMensagem() );
 		}
 	}
 	public void listaMensagensEnviadas() throws FalhaAcessoDadosParticipanteException
@@ -357,7 +351,7 @@ public class Gerenciador
 		System.out.println("Ranking de mensagens enviadas.");
 		Collections.sort(listaParticipantes, new OrdenaEnviadas());
 		for(Participante participante : listaParticipantes)
-			System.out.println(participante.getQntdEnviadas() + " - " + participante.getCodinome() );
+			System.out.println(participante.getQntdEnviadas() + " - " + participante.getNome() );
 	}
 	public void listaMensagensRecebidas() throws FalhaAcessoDadosParticipanteException
 	{		
@@ -397,36 +391,39 @@ public class Gerenciador
 	//Métodos Sugestao Presente
 	
 	@SuppressWarnings("resource")
-	public final ArrayList<SugestaoPresente> adicionaSugestoesPresentes(Participante participante) throws FalhaAcessoDadosSugestaoPresenteException
+	public final ArrayList<SugestaoPresente> adicionaSugestoesPresentes(Participante participante) throws FalhaAcessoDadosSugestaoPresenteException, FalhaAcessoDadosParticipanteException
 	{
-		FileSugestaoPresente sugestaoDao = new FileSugestaoPresente();
 		System.out.printf("Digite a sugestao de presente de %1$s: " + "\r\n", participante.getNome());
-		ArrayList<SugestaoPresente> SugestoesPresentes = participante.getretornaListaPresentes();
+//		ArrayList<SugestaoPresente> SugestoesPresentes = participante.getretornaListaPresentes();
 		SugestaoPresente sug = new SugestaoPresente();
 		sug.setSugestao(new Scanner(System.in).nextLine());
 		
 		listaSugestoesPresentes.add(sug);
-		sugestaoDao.insereSugestaoPresente(sug);
+	//	sugestaoDao.insereSugestaoPresente(sug);
 		participante.addSugestoesPresentes(sug);
+		this.gravaListaParticipantes();
+//		SugestoesPresentes.add(sug);
 		
-		SugestoesPresentes.add(sug);
-		
-		return SugestoesPresentes;
+		return listaSugestoesPresentes;
 	}
 	
-	public void mostraSugestoesPresentes(Participante participante) throws FalhaAcessoDadosSugestaoPresenteException
+	public void mostraSugestoesPresentes(Participante participante) throws FalhaAcessoDadosParticipanteException
 	{
 		
-		this.atualizaListaSugestaoPresente();
-		for(SugestaoPresente p: listaSugestoesPresentes)
-			System.out.println(p.getSugestao());
-
+		ArrayList<SugestaoPresente> sugPresentes = new ArrayList<SugestaoPresente>();
+		sugPresentes = participante.getretornaListaPresentes();
+		
+		for(SugestaoPresente sug: sugPresentes)
+			System.out.println(sug.getSugestao());
+		
 	}
 	
 	
 	//Métodos Patrocinador
 	public Patrocinador cadastroPatrocinador()
 	{
+		try {
+
 		Scanner sc = new Scanner(System.in);
 		Patrocinador patrocinador = new Patrocinador();
 
@@ -442,6 +439,11 @@ public class Gerenciador
 		listaPatrocinadores.add(patrocinador);
 		listaParticipantes.add(patrocinador);
 			return patrocinador;
+		}catch(Exception e)
+		{
+			System.out.println("Formato Incorreto");
+		}
+		return null;
 	}
 	
 	public ArrayList<Patrocinador> retornaPatrocinadores() throws FalhaAcessoDadosPatrocinadorException
@@ -449,7 +451,35 @@ public class Gerenciador
 		atualizaListaPatrocinadores();
 		return listaPatrocinadores;
 	}
-
+	
+	public void cadastroAvisos() throws FalhaAcessoDadosPatrocinadorException
+	{
+		this.atualizaListaPatrocinadores();
+		System.out.println("Digite o nome do patrocinador que deseja deixar um aviso");
+		String pat = new Scanner(System.in).nextLine();
+		Aviso aviso = new Aviso();		
+			for(Patrocinador patrocinador : listaPatrocinadores)
+				if(patrocinador.getNome().equals(pat))
+				{
+					System.out.println("Digite seu aviso: ");
+					aviso.setMsg(new Scanner(System.in).nextLine());
+					patrocinador.cadastrarAvisosGerais(aviso);
+					this.gravaListaPatrocinador();
+				}
+	}
+	
+	public void mostraAvisos() throws FalhaAcessoDadosPatrocinadorException
+	{
+		this.atualizaListaPatrocinadores();
+		ArrayList<Aviso> avisos = new ArrayList<Aviso>();
+		for(Patrocinador patroc: listaPatrocinadores)
+		{
+			avisos = patroc.getAvisos();
+			for(Aviso aviso: avisos)
+				System.out.println(aviso.getMsg());
+		}			
+	}
+		
 	
 /*	public void alteraParticipante(Participante participante)
 	{
