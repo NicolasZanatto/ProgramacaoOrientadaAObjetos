@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.*;
 
 import persistence.exceptions.FalhaAcessoAosDadosException;
+import persistence.exceptions.FalhaAcessoDadosAvisosException;
 import persistence.file.FileAvisosDao;
 
 public class Patrocinador extends Participante implements Serializable
@@ -47,7 +48,7 @@ public class Patrocinador extends Participante implements Serializable
 		
 			try {
 				avisos = (ArrayList<Aviso>) avisoDao.buscaTodos();
-			} catch (FalhaAcessoAosDadosException e) {
+			} catch (FalhaAcessoDadosAvisosException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}

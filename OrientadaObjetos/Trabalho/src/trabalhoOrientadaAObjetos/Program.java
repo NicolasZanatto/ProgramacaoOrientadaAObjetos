@@ -5,13 +5,19 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 import persistence.exceptions.FalhaAcessoAosDadosException;
+import persistence.exceptions.FalhaAcessoDadosAvisosException;
+import persistence.exceptions.FalhaAcessoDadosMensagemException;
+import persistence.exceptions.FalhaAcessoDadosParticipanteException;
+import persistence.exceptions.FalhaAcessoDadosPatrocinadorException;
+import persistence.exceptions.FalhaAcessoDadosSugestaoGeralException;
+import persistence.exceptions.FalhaAcessoDadosSugestaoPresenteException;
 import persistence.file.FileAvisosDao;
 import persistence.file.FileParticipanteDao;
 import persistence.file.FilePatrocinadorDao;
 
 public class Program
 {
-	public static void main(String[] args) throws FalhaAcessoAosDadosException
+	public static void main(String[] args)
 	{
 	
 		Scanner sc = new Scanner(System.in);
@@ -21,56 +27,97 @@ public class Program
 		FileAvisosDao avisosDao = new FileAvisosDao();
 		System.out.println("Visto que o patrocinador é um participante também,\nantes de realizar o sorteio deve-se cadastra-lo. ");
 		Gerenciador.menu();
-		ArrayList<Participante> particip = (ArrayList<Participante>) participanteDao.buscaTodos();
-		ArrayList<Patrocinador> patr = (ArrayList<Patrocinador>) patrocinadorDao.buscaTodos();
-
 		
-		System.out.println("Participantes:");
-		for(Participante par : particip)
-			System.out.println(par.getNome());
-		System.out.println("Patrocinadores:");
-		for(Patrocinador par : patr)
-			System.out.println(par.getNome());
-		
+		ArrayList<Participante> particip;
+		try {
+			particip = (ArrayList<Participante>) participanteDao.buscaTodos();
+			System.out.println("Participantes:");
+			for(Participante par : particip)
+				System.out.println(par.getNome());
+		} catch (FalhaAcessoDadosParticipanteException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		ArrayList<Patrocinador> patr;
+		try {
+			patr = (ArrayList<Patrocinador>) patrocinadorDao.buscaTodos();
+			System.out.println("Patrocinadores:");
+			for(Patrocinador par : patr)
+				System.out.println(par.getNome());
+		} catch (FalhaAcessoDadosPatrocinadorException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		int opcao=sc.nextInt();
 		while(opcao!=0)
 		{	
 			switch(opcao)
 			{
 				case 1: 			//Cadastro Participante
-							//Retornar o objeto cadastrado e passar pra linha de baixo					
-					 participanteDao.insereParticipante(Gerenciador.cadastroInfo()); 
+					try{						
+						participanteDao.insereParticipante(Gerenciador.cadastroInfo()); 
+					}catch(FalhaAcessoDadosParticipanteException e)
+					{
+						System.out.println(e.getMessage() + ", case 1");
+					}
 					break;
 			
 				case 2:				//Add sugestoes de presentes
-					
-					System.out.println("Digite para qual participante deseja adicionar sugestões de presentes.");
-					Participante part = Gerenciador.procuraParticipante(new Scanner(System.in).nextLine());
+						
+						System.out.println("Digite para qual participante deseja adicionar sugestões de presentes.");
+				Participante part;
+				try {
+					part = Gerenciador.procuraParticipante(new Scanner(System.in).nextLine());
 					if(part!=null)
 					{
-					Gerenciador.adicionaSugestoesPresentes(part);
+						Gerenciador.adicionaSugestoesPresentes(part);
 					}
 					else
 						System.out.println("Participante não encontrado");
+				
+				} catch (FalhaAcessoDadosParticipanteException e1) {
+					System.out.println(e1.getMessage() + ", case 2");
+				} catch (FalhaAcessoDadosSugestaoPresenteException e) {
+					System.out.println(e.getMessage() + ", case 2");
+				}
+						
+
+					
+					
 					break;	
 			
 				case 3:				//Sorteia
-					if(Gerenciador.retornaParticipantes().size()>2)
-					{
-						Gerenciador.matchSorteio(Gerenciador.sorteio(), Gerenciador.retornaParticipantes());
-						System.out.println("Sorteio realizado com sucesso!");
+					try{
+						if(Gerenciador.retornaParticipantes().size()>2)
+						{
+							Gerenciador.matchSorteio(Gerenciador.sorteio(), Gerenciador.retornaParticipantes());
+							System.out.println("Sorteio realizado com sucesso!");
+						}
+						else
+							System.out.println("Não há participantes suficientes para o sorteio");
+					
+					}catch(FalhaAcessoDadosParticipanteException e){
+							System.out.println(e.getMessage() + ", case 3");
 					}
 					
-					else
-						System.out.println("Não há participantes suficientes para o sorteio");
 					break;
 					
 				case 4: 			//Envia msg
+				try {
 					Gerenciador.enviaMensagem();
+				} catch (FalhaAcessoDadosMensagemException e) {
+					System.out.println(e.getMessage() + ", case 4");
+				} catch (FalhaAcessoDadosParticipanteException e) {
+					System.out.println(e.getMessage() + ", case 4");
+				}
 					break;
 			
 				case 5:				//Mostra msg enviadas
+				try {
 					Gerenciador.mostraMensagensEnviadas();
+				} catch (FalhaAcessoDadosMensagemException e) {
+					System.out.println(e.getMessage() + ", case 5");
+				}
 					break;
 			
 				case 6:				//Sugestoes de presentes de algum participante
@@ -81,23 +128,40 @@ public class Program
 					boolean encontrou=false;
 					if(busca==1)
 					{
-						for(Participante partic : Gerenciador.retornaParticipantes()){
-							
-							if(partic.getNome().equals(buscaS))
-							{
-								encontrou=true;
-								Gerenciador.mostraSugestoesPresentes(partic);
+						try {
+							for(Participante partic : Gerenciador.retornaParticipantes()){
+								
+								if(partic.getNome().equals(buscaS))
+								{
+									encontrou=true;
+									Gerenciador.mostraSugestoesPresentes(partic);
+								}
 							}
+						} catch (FalhaAcessoDadosParticipanteException e) {
+							System.out.println(e.getMessage() + ", case 6, busca=1");
+						} catch (FalhaAcessoDadosSugestaoPresenteException e) {
+							System.out.println(e.getMessage() + ", case 6, busca=1");
 						}
 						if(encontrou==false) System.out.println("Participante não encontrado.");
 					}
 					else if(busca==2)
 					{
-						for(Participante partic : Gerenciador.retornaParticipantes())
-							if(partic.getCodinome().equals(buscaS))
-							{
-								partic.mostraListaPresentes();
-							}
+						try {
+							for(Participante partic : Gerenciador.retornaParticipantes())
+								if(partic.getCodinome().equals(buscaS))
+								{
+									encontrou=true;
+									
+									Gerenciador.mostraSugestoesPresentes(partic);
+								}
+						} catch (FalhaAcessoDadosParticipanteException e) {
+							System.out.println(e.getMessage() + ", case 6, busca=2");
+
+						} catch (FalhaAcessoDadosSugestaoPresenteException e) {
+							System.out.println(e.getMessage() + ", case 6, busca=2");
+
+						}
+						
 						if(encontrou==false) System.out.println("Participante não encontrado.");
 					}
 					else System.out.println("Número para busca incorreto!");
@@ -106,23 +170,42 @@ public class Program
 				case 7: 		//Cadastra sugestoes
 					System.out.println("Digite o participante que dará a sugestão");
 					String Nome = new Scanner(System.in).nextLine();
-					Participante p = Gerenciador.estaNaLista(Nome);
+				Participante p;
+				try {
+					p = Gerenciador.estaNaLista(Nome);
+
 					if(p!=null)
 					{
 						System.out.println("teste entrou");
 						Gerenciador.criaSugestaoGeral(p);
 					}
 					else System.out.println("Participante não encontrado!");
+				} catch (FalhaAcessoDadosParticipanteException e) {
+					System.out.println(e.getMessage() + ", case 7");
+
+				} catch (FalhaAcessoDadosSugestaoGeralException e) {
+					System.out.println(e.getMessage() + ", case 7");
+				}
 					break;
 					
 				case 8:			//Mostra sugestoes gerais
 					System.out.println("Lista de Sugestões.");
+				try {
 					Gerenciador.mostraSugestoesGerais();
+				} catch (FalhaAcessoDadosSugestaoGeralException e) {
+					System.out.println(e.getMessage() + ", case 8");
+
+				}
 					break;
 			
 				case 9:			//Lista por quem enviou e recebeu mais msgs
+				try {
 					Gerenciador.listaMensagensEnviadas();
 					Gerenciador.listaMensagensRecebidas();
+				} catch (FalhaAcessoDadosParticipanteException e) {
+					System.out.println(e.getMessage() + ", case 9");
+				}
+					
 					break;
 			
 				case 10: 		//Mostra amigo secreto
@@ -133,29 +216,51 @@ public class Program
 					
 					Patrocinador patroc = new Patrocinador();
 					patroc = Gerenciador.cadastroPatrocinador();
-					participanteDao.insereParticipante(patroc);
-					patrocinadorDao.inserePatrocinador(patroc);
+					try {
+						patrocinadorDao.inserePatrocinador(patroc);
+						participanteDao.insereParticipante(patroc);
+					} catch (FalhaAcessoDadosParticipanteException e) {
+						System.out.println(e.getMessage() + ", case 11");
+						e.printStackTrace();
+					} catch (FalhaAcessoDadosPatrocinadorException e) {
+						System.out.println(e.getMessage() + ", case 11");
+	
+					}
+					
 					break;
 				
 				case 12:		//Cadastra aviso
 					System.out.println("Digite o nome do patrocinador que deseja deixar um aviso");
 					String pat = new Scanner(System.in).nextLine();
 					
-					for(Patrocinador patrocinador : Gerenciador.retornaPatrocinadores())
-						if(patrocinador.getNome().equals(pat))
-						{
-							System.out.println("Digite seu aviso: ");
-						
-							avisosDao.insereAviso(patrocinador.cadastrarAvisosGerais(new Scanner(System.in).nextLine()));
-						}
+					try {
+						for(Patrocinador patrocinador : Gerenciador.retornaPatrocinadores())
+							if(patrocinador.getNome().equals(pat))
+							{
+								System.out.println("Digite seu aviso: ");
+							
+								avisosDao.insereAviso(patrocinador.cadastrarAvisosGerais(new Scanner(System.in).nextLine()));
+							}
+					} catch (FalhaAcessoDadosPatrocinadorException e) {
+						System.out.println(e.getMessage() + ", case 12");
+	
+					} catch (FalhaAcessoDadosAvisosException e) {
+						System.out.println(e.getMessage() + ", case 12");
+	
+					}
 				
 					break;
+				
 				case 13:		//Mostra avisos
 					System.out.println("Lista de Avisos Gerais.");
-					for(Patrocinador patrocinador : Gerenciador.retornaPatrocinadores())
-					{
-						System.out.println("Entrou!");
-						patrocinador.showAvisosGerais();
+					try {
+						for(Patrocinador patrocinador : Gerenciador.retornaPatrocinadores())
+						{
+							System.out.println("Entrou!");
+							patrocinador.showAvisosGerais();
+						}
+					} catch (FalhaAcessoDadosPatrocinadorException e) {
+						System.out.println(e.getMessage() + ", case 13");
 					}
 						break;
 				
@@ -163,9 +268,14 @@ public class Program
 					System.out.println("Demonstrativos Finais");
 					System.out.println("Amigo Secreto:\n");
 					Gerenciador.mostraAmigosSecretos();
+				try {
 					System.out.println("\nQuantidade de mensagens enviadas =" + Gerenciador.getListaDeMensagens().size());
 					Gerenciador.listaMensagensRecebidas();
 					Gerenciador.listaMensagensEnviadas();
+				} catch (FalhaAcessoDadosMensagemException | FalhaAcessoDadosParticipanteException e) {
+					System.out.println(e.getMessage() + ", case 14");
+				}
+				
 					opcao=0;
 					break;
 					

@@ -9,7 +9,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import persistence.exceptions.FalhaAcessoAosDadosException;
+import persistence.exceptions.FalhaAcessoDadosSugestaoGeralException;
 import persistence.intf.SugestaoGeralDao;
 import trabalhoOrientadaAObjetos.Sugestao;
 
@@ -19,13 +19,13 @@ public class FileSugestaoGeralDao implements SugestaoGeralDao
 protected static String NOME_ARQUIVO = "sugestaoGeral.dat";
 	
 	@Override
-	public List<Sugestao> buscaTodos() throws FalhaAcessoAosDadosException {
+	public List<Sugestao> buscaTodos() throws FalhaAcessoDadosSugestaoGeralException {
 
 		return this.getSugestaoGeral();
 	}
 	
 	@Override
-	public int insereSugestaoGeral(Sugestao sugestao) throws FalhaAcessoAosDadosException {
+	public int insereSugestaoGeral(Sugestao sugestao) throws FalhaAcessoDadosSugestaoGeralException {
 		List<Sugestao> sugestoes = this.getSugestaoGeral();
 		sugestoes.add(sugestao);
 		this.gravaArquivo(sugestoes);
@@ -33,7 +33,7 @@ protected static String NOME_ARQUIVO = "sugestaoGeral.dat";
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected List<Sugestao> getSugestaoGeral() throws FalhaAcessoAosDadosException {	//INPUT - lê
+	protected List<Sugestao> getSugestaoGeral() throws FalhaAcessoDadosSugestaoGeralException {	//INPUT - lê
 		List<Sugestao> sugestoes = new ArrayList<Sugestao>();
 		ObjectInputStream ois = null;
 		try {
@@ -44,10 +44,10 @@ protected static String NOME_ARQUIVO = "sugestaoGeral.dat";
 		} catch (FileNotFoundException e) {
 			this.gravaArquivo(sugestoes);
 		} catch (IOException e) {
-			throw new FalhaAcessoAosDadosException("Problemas lendo o arquivo "
+			throw new FalhaAcessoDadosSugestaoGeralException("Problemas lendo o arquivo "
 					+ NOME_ARQUIVO, e);
 		} catch (ClassNotFoundException e) {
-			throw new FalhaAcessoAosDadosException("Problemas lendo o arquivo "
+			throw new FalhaAcessoDadosSugestaoGeralException("Problemas lendo o arquivo "
 					+ NOME_ARQUIVO, e);
 		} finally {
 			try {
@@ -62,7 +62,7 @@ protected static String NOME_ARQUIVO = "sugestaoGeral.dat";
 	}
 
 	protected void gravaArquivo(List<Sugestao> sugestao)					//OUTPUT - Escreve
-				throws FalhaAcessoAosDadosException {
+				throws FalhaAcessoDadosSugestaoGeralException {
 			FileOutputStream fout;
 			try {
 				fout = new FileOutputStream(NOME_ARQUIVO);
@@ -70,7 +70,7 @@ protected static String NOME_ARQUIVO = "sugestaoGeral.dat";
 				oos.writeObject(sugestao);
 				oos.close();
 			} catch (IOException e) {
-				throw new FalhaAcessoAosDadosException(
+				throw new FalhaAcessoDadosSugestaoGeralException(
 						"Problemas gravando o arquivo " + NOME_ARQUIVO, e);
 			}
 		}

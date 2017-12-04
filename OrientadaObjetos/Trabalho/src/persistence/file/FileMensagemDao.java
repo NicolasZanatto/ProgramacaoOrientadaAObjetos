@@ -9,7 +9,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import persistence.exceptions.FalhaAcessoAosDadosException;
+import persistence.exceptions.FalhaAcessoDadosMensagemException;
 import persistence.intf.MensagemDao;
 import trabalhoOrientadaAObjetos.Mensagem;
 
@@ -18,12 +18,12 @@ public class FileMensagemDao implements MensagemDao {
 	protected static String NOME_ARQUIVO = "mensagens.dat";
 
 	@Override
-	public List<Mensagem> buscaTodos() throws FalhaAcessoAosDadosException {
+	public List<Mensagem> buscaTodos() throws FalhaAcessoDadosMensagemException {
 		return getMensagens();
 	}
 
 	@Override
-	public int insereMensagem(Mensagem mensagem) throws FalhaAcessoAosDadosException {
+	public int insereMensagem(Mensagem mensagem) throws FalhaAcessoDadosMensagemException {
 		List<Mensagem> mensagens = this.getMensagens();
 		mensagens.add(mensagem);
 		this.gravaArquivo(mensagens);
@@ -31,7 +31,7 @@ public class FileMensagemDao implements MensagemDao {
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected List<Mensagem> getMensagens() throws FalhaAcessoAosDadosException {	//INPUT - lê
+	protected List<Mensagem> getMensagens() throws FalhaAcessoDadosMensagemException {	//INPUT - lê
 		List<Mensagem> mensagens = new ArrayList<Mensagem>();
 		ObjectInputStream ois = null;
 		try {
@@ -42,10 +42,10 @@ public class FileMensagemDao implements MensagemDao {
 		} catch (FileNotFoundException e) {
 			this.gravaArquivo(mensagens);
 		} catch (IOException e) {
-			throw new FalhaAcessoAosDadosException("Problemas lendo o arquivo "
+			throw new FalhaAcessoDadosMensagemException("Problemas lendo o arquivo "
 					+ NOME_ARQUIVO, e);
 		} catch (ClassNotFoundException e) {
-			throw new FalhaAcessoAosDadosException("Problemas lendo o arquivo "
+			throw new FalhaAcessoDadosMensagemException("Problemas lendo o arquivo "
 					+ NOME_ARQUIVO, e);
 		} finally {
 			try {
@@ -60,7 +60,7 @@ public class FileMensagemDao implements MensagemDao {
 	}
 	
 	protected void gravaArquivo(List<Mensagem> mensagem)					//OUTPUT - Escreve
-			throws FalhaAcessoAosDadosException {
+			throws FalhaAcessoDadosMensagemException {
 		FileOutputStream fout;
 		try {
 			fout = new FileOutputStream(NOME_ARQUIVO);
@@ -68,7 +68,7 @@ public class FileMensagemDao implements MensagemDao {
 			oos.writeObject(mensagem);
 			oos.close();
 		} catch (IOException e) {
-			throw new FalhaAcessoAosDadosException(
+			throw new FalhaAcessoDadosMensagemException(
 					"Problemas gravando o arquivo " + NOME_ARQUIVO, e);
 		}
 	}

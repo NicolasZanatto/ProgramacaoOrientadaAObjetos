@@ -2,13 +2,13 @@ package persistence.intf;
 
 import java.util.List;
 
-import persistence.exceptions.FalhaAcessoAosDadosException;
+import persistence.exceptions.FalhaAcessoDadosSugestaoGeralException;
 import trabalhoOrientadaAObjetos.Sugestao;
 
 public interface SugestaoGeralDao {
 	
-	public abstract List<Sugestao> buscaTodos() throws FalhaAcessoAosDadosException;
+	public abstract List<Sugestao> buscaTodos() throws FalhaAcessoDadosSugestaoGeralException;
 
-	public abstract int insereSugestaoGeral(Sugestao sugestao) throws FalhaAcessoAosDadosException;
+	public abstract int insereSugestaoGeral(Sugestao sugestao) throws FalhaAcessoDadosSugestaoGeralException;
 	
 }
