@@ -121,7 +121,6 @@ public class Gerenciador
 			atualizaListaParticipantes();
 			for(Participante part : listaParticipantes)
 			{
-				System.out.println("Participante="+ part.getNome());
 				if(part.getNome().equals(nome)) return part;
 			}
 				return null;		
@@ -221,9 +220,10 @@ public class Gerenciador
 	public void mostraCodinomes() throws FalhaAcessoDadosParticipanteException
 	{
 		
-		atualizaListaParticipantes();		
+		atualizaListaParticipantes();
+		System.out.println("Codinomes:");
 		for( Participante participante : listaParticipantes)
-			System.out.println(participante.getCodinome() + " = " + participante.getNome() );
+			System.out.println("  " + participante.getCodinome());
 	}
 	
 	public Participante estaNaLista(String nome) throws FalhaAcessoDadosParticipanteException
@@ -412,7 +412,7 @@ public class Gerenciador
 		
 		ArrayList<SugestaoPresente> sugPresentes = new ArrayList<SugestaoPresente>();
 		sugPresentes = participante.getretornaListaPresentes();
-		
+		System.out.println("Lista de Presentes de " + participante.getNome());
 		for(SugestaoPresente sug: sugPresentes)
 			System.out.println(sug.getSugestao());
 		
@@ -452,7 +452,7 @@ public class Gerenciador
 		return listaPatrocinadores;
 	}
 	
-	public void cadastroAvisos() throws FalhaAcessoDadosPatrocinadorException
+	public int cadastroAvisos() throws FalhaAcessoDadosPatrocinadorException
 	{
 		this.atualizaListaPatrocinadores();
 		System.out.println("Digite o nome do patrocinador que deseja deixar um aviso");
@@ -465,7 +465,9 @@ public class Gerenciador
 					aviso.setMsg(new Scanner(System.in).nextLine());
 					patrocinador.cadastrarAvisosGerais(aviso);
 					this.gravaListaPatrocinador();
+					return 1;
 				}
+		return 0;
 	}
 	
 	public void mostraAvisos() throws FalhaAcessoDadosPatrocinadorException

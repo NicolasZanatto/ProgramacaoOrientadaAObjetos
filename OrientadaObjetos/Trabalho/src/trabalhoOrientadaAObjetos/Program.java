@@ -25,28 +25,7 @@ public class Program
 		FileParticipanteDao participanteDao = new FileParticipanteDao();
 		System.out.println("Visto que o patrocinador é um participante também,\nantes de realizar o sorteio deve-se cadastra-lo. ");
 		Gerenciador.menu();
-		
-		ArrayList<Participante> particip;
-		try {
-			particip = (ArrayList<Participante>) participanteDao.buscaTodos();
-			System.out.println("Participantes:");
-			for(Participante par : particip)
-				System.out.println(par.getNome());
-		} catch (FalhaAcessoDadosParticipanteException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		ArrayList<Patrocinador> patr;
-		try {
-			patr = (ArrayList<Patrocinador>) patrocinadorDao.buscaTodos();
-			System.out.println("Patrocinadores:");
-			for(Patrocinador par : patr)
-				System.out.println(par.getNome());
-		} catch (FalhaAcessoDadosPatrocinadorException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		int opcao=sc.nextInt();
+				int opcao=sc.nextInt();
 		while(opcao!=0)
 		{	
 			switch(opcao)
@@ -232,7 +211,8 @@ public class Program
 				
 				case 12:		//Cadastra aviso
 				try {
-					Gerenciador.cadastroAvisos();
+					if(Gerenciador.cadastroAvisos()==0)
+						System.out.println("Patrocinador não encontrado!");
 				} catch (FalhaAcessoDadosPatrocinadorException e) {
 					System.out.println(e.getMessage() + ", case 12");
 
@@ -255,14 +235,13 @@ public class Program
 					System.out.println("Demonstrativos Finais");
 					System.out.println("Amigo Secreto:\n");
 					Gerenciador.mostraAmigosSecretos();
-					System.out.println("\nQuantidade de mensagens enviadas =" + Gerenciador.getListaDeMensagens());
+					System.out.println("\nQuantidade de mensagens enviadas = " + Gerenciador.getListaDeMensagens());
 					Gerenciador.listaMensagensRecebidas();
 					Gerenciador.listaMensagensEnviadas();
 				} catch (FalhaAcessoDadosParticipanteException e) {
 					System.out.println(e.getMessage() + ", case 14");
 				}
 				
-					opcao=0;
 					break;
 					
 				default:
